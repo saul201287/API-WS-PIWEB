@@ -90,7 +90,7 @@ const optionsHTTPS = {
   cert: fs.readFileSync(String(process.env.RUTA_CERTIFICADO)),
 };
 
-const server = https.createServer(credentials, app);
+const server = https.createServer(optionsHTTPS, app);
 
 server.listen(port, () => {
   console.log(`API corriendo en el puerto ${port}`);
