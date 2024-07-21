@@ -57,7 +57,7 @@ io.on("connection", (socket) => {
     console.log("Notificación recibida:", data);
     const { id_user, tipo, data: message } = data;
 
-    io.to(id_user).emit("notification-alert", {
+    io.to(id_user).emit("notification-alerts", {
       id_user,
       tipo,
       message,
