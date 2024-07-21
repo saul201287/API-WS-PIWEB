@@ -4,7 +4,7 @@ async function createToken(id_user) {
   try {
     let secret = process.env.SECRET_KEY_TOKEN;
     const payload = { id_user };
-    return sign(payload, secret, { expiresIn: "1h" });
+    return jwt.sign(payload, secret, { expiresIn: "1h" });
   } catch (error) {
     console.error(error);
     return "error: " + error;
@@ -13,22 +13,29 @@ async function createToken(id_user) {
 
 async function verifyToken(socket, next) {
   const token = socket.handshake.auth.token;
-  console.log(token);
+  console.log("Token recibido:", token);
   if (!token) {
     return next(new Error("Token de autenticación no proporcionado"));
   }
+
   try {
-    const data2 = jwt.verify(token, process.env.SECRET_KEY_TOKEN);
-    socket.decoded = data2;
+    const decoded = jwt.verify(token, process.env.SECRET_KEY_TOKEN);
+    socket.decoded = decoded;
     next();
-    console.log(data2);
+    console.log("Token decodificado:", decoded);
   } catch (error) {
-    if (error instanceof TokenExpiredError) {
-      const newToken = await createToken(
-        verify(token, secret, { ignoreExpiration: true }).id_user
-      );
-      socket.decoded = newToken;
-      next();
+    if (error.name === "TokenExpiredError") {
+      try {
+        const decodedExpired = jwt.verify(token, process.env.SECRET_KEY_TOKEN, { ignoreExpiration: true });
+        const newToken = await createToken(decodedExpired.id_user);
+        socket.handshake.auth.token = newToken;
+        const decodedNew = jwt.verify(newToken, process.env.SECRET_KEY_TOKEN);
+        socket.decoded = decodedNew;
+        next();
+      } catch (innerError) {
+        console.log(innerError);
+        return next(new Error("Error al renovar el token de autenticación"));
+      }
     } else {
       console.log(error);
       return next(new Error("Token de autenticación inválido"));

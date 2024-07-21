@@ -27,6 +27,7 @@ io.use((socket, next) => {
 
 io.use((socket, next) => {
   const id_user = socket.handshake.query.id_user;
+  
   if (!id_user) {
     return next(new Error("Falta el id_user"));
   }
