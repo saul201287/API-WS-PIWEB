@@ -43,14 +43,13 @@ io.on("connection", (socket) => {
 
   socket.on("data", (data) => {
     console.log("Datos recibidos:", data);
-    const { id_user, vrms, irms, kwh } = data;
-
-    // Aquí puedes realizar cualquier operación con los datos recibidos
+    const { id_user, consumo_kwh, whs, ampers, voltaje } = data;
     io.to(id_user).emit("datas", {
       id_user,
-      vrms,
-      irms,
-      kwh,
+      consumo_kwh,
+      whs,
+      ampers,
+      voltaje,
     });
   });
 
@@ -70,6 +69,7 @@ io.on("connection", (socket) => {
   });
 });
 */
+
 const express = require("express");
 const { Server } = require("socket.io");
 const cors = require("cors");
@@ -123,13 +123,13 @@ io.on("connection", (socket) => {
 
   socket.on("data", (data) => {
     console.log("Datos recibidos:", data);
-    const { id_user, vrms, irms, kwh } = data;
-
+    const { id_user, consumo_kwh, whs, ampers, voltaje } = data;
     io.to(id_user).emit("datas", {
       id_user,
-      vrms,
-      irms,
-      kwh,
+      consumo_kwh,
+      whs,
+      ampers,
+      voltaje,
     });
   });
 
